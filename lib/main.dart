@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 void main() {
   runApp(const RootPage());
@@ -17,13 +18,132 @@ class RootPage extends StatelessWidget {
         fontFamily: 'PTSans',
         primarySwatch: Colors.blue,
       ),
-      home: const MainPage(),
+      home: MainPage(),
     );
   }
 }
 
 class MainPage extends StatelessWidget {
-  const MainPage({Key? key}) : super(key: key);
+  MainPage({Key? key}) : super(key: key);
+
+  var calcMainString = ''.obs;
+  var calcSubString = ''.obs;
+  var tempNum = ''.obs;
+  var num1 = ''.obs;
+  var num2;
+  var result = 0.0.obs;
+  var signFlag = false.obs;
+  String arithmaticOperator = '';
+
+  // _calculate(double a, double b) {
+  //   return (a + b).toString();
+  // }
+
+  void _additionFunc(String string) {
+    if (signFlag.value) {
+      // calcMainString.value = '${calcMainString.value} $string ';
+      if (string.isNum) {
+        signFlag.value = false;
+        calcSubString.value =
+            (int.parse(num1.value) + int.parse(tempNum.value)).toString();
+      } else {
+        // result.value = result.value + double.parse(tempNum.value);
+        // num1.value = result.value.toString();
+        // tempNum.value = '';
+        if (calcSubString.isNotEmpty) {
+          num1.value = calcSubString.value;
+          tempNum.value = '';
+        } else {
+          num1.value = tempNum.value;
+          tempNum.value = '';
+        }
+      }
+    }
+  }
+
+  void _getString(String string) {
+    signFlag.value = true;
+    if (calcMainString.value != '0') {
+      if (string.isNum) {
+        tempNum.value = '${tempNum.value}$string';
+      } else {
+        arithmaticOperator = string;
+      }
+
+      calcMainString.value = '${calcMainString.value}$string';
+      if (num1.value.isNotEmpty && tempNum.value.isNotEmpty) {
+        if (arithmaticOperator == '+') {
+          _additionFunc(string);
+        } else if (arithmaticOperator == '-') {
+          _subtractionFunc(string);
+        } else if (arithmaticOperator == 'x') {
+          _multiplicatonFunc(string);
+        }
+      }
+    } else {
+      if (string == '0') {
+        calcMainString.value = '0';
+        tempNum.value = '0';
+      } else {
+        tempNum.value =
+            tempNum.value == '0' ? string : '${tempNum.value}$string';
+        calcMainString.value = tempNum.value;
+      }
+    }
+  }
+
+  void _subtractionFunc(String string) {
+    if (signFlag.value) {
+      // calcMainString.value = '${calcMainString.value} $string ';
+      if (string.isNum) {
+        signFlag.value = false;
+        calcSubString.value =
+            (int.parse(num1.value) - int.parse(tempNum.value)).toString();
+        // result.value = double.parse(calcSubString.value);
+      } else {
+        // result.value = result.value - double.parse(tempNum.value);
+        // num1.value = result.value.toString();
+        if (calcSubString.isNotEmpty) {
+          num1.value = calcSubString.value;
+          tempNum.value = '';
+        } else {
+          num1.value = tempNum.value;
+          tempNum.value = '';
+        }
+      }
+    }
+  }
+
+  void _multiplicatonFunc(String string) {
+    if (signFlag.value) {
+      // calcMainString.value = '${calcMainString.value} $string ';
+      if (string.isNum) {
+        signFlag.value = false;
+        calcSubString.value =
+            (int.parse(num1.value) * int.parse(tempNum.value)).toString();
+        // result.value = double.parse(calcSubString.value);
+      } else {
+        // result.value = result.value - double.parse(tempNum.value);
+        // num1.value = result.value.toString();
+        if (calcSubString.isNotEmpty) {
+          num1.value = calcSubString.value;
+          tempNum.value = '';
+        } else {
+          num1.value = tempNum.value;
+          tempNum.value = '';
+        }
+      }
+    }
+  }
+
+  void _resetFunc() {
+    calcMainString.value = '';
+    calcSubString.value = '';
+    tempNum.value = '';
+    num1.value = '';
+    result.value = 0;
+    signFlag.value = false;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,9 +167,37 @@ class MainPage extends StatelessWidget {
               // Result Sec
               Container(
                 height: MediaQuery.of(context).size.height * 0.15,
+                width: double.infinity,
                 decoration: BoxDecoration(
                   color: const Color(0xff192030),
                   borderRadius: BorderRadius.circular(15),
+                ),
+                child: Align(
+                  alignment: Alignment.centerRight,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Obx(
+                      () => Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                            calcMainString.value,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 38,
+                            ),
+                          ),
+                          Text(
+                            calcSubString.value,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 22,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
               ),
               const SizedBox(
@@ -68,85 +216,140 @@ class MainPage extends StatelessWidget {
                   children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: const [
-                        NumBtn(
-                          string: '7',
+                      children: [
+                        GestureDetector(
+                          onTap: () => _getString('7'),
+                          child: NumBtn(
+                            string: '7',
+                          ),
                         ),
-                        NumBtn(
-                          string: '8',
+                        GestureDetector(
+                          onTap: () => _getString('8'),
+                          child: NumBtn(
+                            string: '8',
+                          ),
                         ),
-                        NumBtn(
-                          string: '9',
+                        GestureDetector(
+                          onTap: () => _getString('9'),
+                          child: NumBtn(
+                            string: '9',
+                          ),
                         ),
-                        NumBtn(
-                          string: 'DEL',
-                          color: Color(0xff3a4764),
-                        ),
-                      ],
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: const [
-                        NumBtn(
-                          string: '4',
-                        ),
-                        NumBtn(
-                          string: '5',
-                        ),
-                        NumBtn(
-                          string: '6',
-                        ),
-                        NumBtn(
-                          string: '+',
+                        GestureDetector(
+                          // onTap: () => _calcFunc('DEL'),
+                          child: NumBtn(
+                            string: 'DEL',
+                            color: const Color(0xff3a4764),
+                          ),
                         ),
                       ],
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: const [
-                        NumBtn(
-                          string: '1',
+                      children: [
+                        GestureDetector(
+                          onTap: () => _getString('4'),
+                          child: NumBtn(
+                            string: '4',
+                          ),
                         ),
-                        NumBtn(
-                          string: '2',
+                        GestureDetector(
+                          onTap: () => _getString('5'),
+                          child: NumBtn(
+                            string: '5',
+                          ),
                         ),
-                        NumBtn(
-                          string: '3',
+                        GestureDetector(
+                          onTap: () => _getString('6'),
+                          child: NumBtn(
+                            string: '6',
+                          ),
                         ),
-                        NumBtn(
-                          string: '-',
-                        ),
-                      ],
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: const [
-                        NumBtn(
-                          string: '.',
-                        ),
-                        NumBtn(
-                          string: '0',
-                        ),
-                        NumBtn(
-                          string: '/',
-                        ),
-                        NumBtn(
-                          string: 'X',
+                        GestureDetector(
+                          onTap: () => {_additionFunc('+'), _getString('+')},
+                          child: NumBtn(
+                            string: '+',
+                          ),
                         ),
                       ],
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: const [
-                        NumBtn(
-                          string: 'RESET',
-                          widthFactor: 2,
-                          color: Color(0xff3a4764),
+                      children: [
+                        GestureDetector(
+                          onTap: () => _getString('1'),
+                          child: NumBtn(
+                            string: '1',
+                          ),
                         ),
-                        NumBtn(
-                          string: '=',
-                          widthFactor: 2,
-                          color: Colors.redAccent,
+                        GestureDetector(
+                          onTap: () => _getString('2'),
+                          child: NumBtn(
+                            string: '2',
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () => _getString('3'),
+                          child: NumBtn(
+                            string: '3',
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () => {_subtractionFunc('-'), _getString('-')},
+                          child: NumBtn(
+                            string: '-',
+                          ),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        GestureDetector(
+                          // onTap: () => _calcFunc('.'),
+                          child: NumBtn(
+                            string: '.',
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () => _getString('0'),
+                          child: NumBtn(
+                            string: '0',
+                          ),
+                        ),
+                        GestureDetector(
+                          //  onTap: () => _calcFunc('/'),
+                          child: NumBtn(
+                            string: '/',
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () =>
+                              {_multiplicatonFunc('x'), _getString('x')},
+                          child: NumBtn(
+                            string: 'x',
+                          ),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        GestureDetector(
+                          onTap: () => _resetFunc(),
+                          child: NumBtn(
+                            string: 'RESET',
+                            widthFactor: 2,
+                            color: const Color(0xff3a4764),
+                          ),
+                        ),
+                        GestureDetector(
+                          // onTap: () => _calcFunc('='),
+                          child: NumBtn(
+                            string: '=',
+                            widthFactor: 2,
+                            color: Colors.redAccent,
+                          ),
                         ),
                       ],
                     ),
@@ -162,7 +365,7 @@ class MainPage extends StatelessWidget {
 }
 
 class NumBtn extends StatelessWidget {
-  const NumBtn(
+  NumBtn(
       {Key? key,
       required this.string,
       this.color = Colors.white,
@@ -172,6 +375,8 @@ class NumBtn extends StatelessWidget {
   final double widthFactor;
   final Color color;
   final String string;
+
+  var tempNum = ''.obs;
 
   @override
   Widget build(BuildContext context) {
